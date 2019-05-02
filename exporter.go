@@ -224,8 +224,12 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 		vec.Reset()
 	}
 
-	e.up.Set(0)
-	defer func() { ch <- e.up }()
+	var isUp float64 = 0
+
+	defer func() {
+		e.up.Set(isUp)
+		ch <- e.up
+	}()
 
 	resp, err := e.client.Get(e.AdminCoreURL)
 	if err != nil {
@@ -304,5 +308,5 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	// Successfully processed stats.
-	e.up.Set(1)
+	isUp = 1
 }
